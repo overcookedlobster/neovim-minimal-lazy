@@ -9,53 +9,50 @@ vim.g.maplocalleader = "\\"
 local config_dir = vim.fn.stdpath("config")
 package.path = config_dir .. "/?.lua;" .. config_dir .. "/?/init.lua;" .. package.path
 
--- Completely bypass lazy.nvim due to persistent issues
--- Use only built-in Neovim features for a stable configuration
+-- Properly bootstrap lazy.nvim with error handling
+local plugin_dir = "/nfs/iil/proj/mpg/sa_09/chip_design/projects/usb2/sonora3/ysalomox/nvim-plugins"
+local lazypath = plugin_dir .. "/lazy/lazy.nvim"
 
-print("Loading minimal Neovim configuration with built-in features...")
+print("Initializing lazy.nvim...")
 
--- Basic colorscheme (using built-in schemes)
-vim.cmd([[
-  try
-    colorscheme desert
-  catch
-    colorscheme default
-  endtry
-]])
+-- Function to check if lazy.nvim installation is complete
+local function is_lazy_complete()
+  return vim.fn.isdirectory(lazypath) == 1 and
+         vim.fn.isdirectory(lazypath .. "/lua") == 1 and
+         vim.fn.isdirectory(lazypath .. "/doc") == 1
+end
 
--- Basic file explorer using netrw (built-in)
-vim.g.netrw_banner = 0
-vim.g.netrw_liststyle = 3
-vim.g.netrw_browse_split = 4
-vim.g.netrw_altv = 1
-vim.g.netrw_winsize = 25
+-- Bootstrap lazy.nvim if needed
+if not is_lazy_complete() then
+  print("Lazy.nvim not found or incomplete, installing...")
 
--- Key mapping for file explorer
-vim.keymap.set("n", "<leader>e", ":Explore<CR>", { desc = "Open file explorer" })
+  -- Clean up any broken installation
+  vim.fn.system({"rm", "-rf", lazypath})
 
--- Basic find functionality using built-in commands
-vim.keymap.set("n", "<leader>ff", ":find ", { desc = "Find files" })
-vim.keymap.set("n", "<leader>fg", ":grep ", { desc = "Grep search" })
-vim.keymap.set("n", "<leader>fb", ":ls<CR>:b ", { desc = "List buffers" })
+  -- Ensure plugin directory exists
+  vim.fn.mkdir(plugin_dir, "p")
 
--- Basic status line
-vim.opt.laststatus = 2
-vim.opt.statusline = "%f %h%m%r%=%-14.(%l,%c%V%) %P"
+  -- Clone lazy.nvim
+  local clone_result = vim.fn.system({
+    "git", "clone", "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable",
+    lazypath,
+  })
 
--- Enable syntax highlighting (built-in)
-vim.cmd("syntax enable")
+  -- Verify installation
+  if not is_lazy_complete() then
+    error("Failed to install lazy.nvim properly. Clone result: " .. tostring(clone_result))
+  end
 
--- Basic completion
-vim.opt.wildmenu = true
-vim.opt.wildmode = "longest:full,full"
+  print("Lazy.nvim installed successfully!")
+end
 
-print("Minimal configuration loaded successfully!")
-print("Using only built-in Neovim features.")
-print("Key mappings:")
-print("  <leader>e  - Open file explorer")
-print("  <leader>ff - Find files")
-print("  <leader>fg - Grep search")
-print("  <leader>fb - List buffers")
+-- Add lazy.nvim to runtime path
+vim.opt.rtp:prepend(lazypath)
+
+-- Bootstrap lazy.nvim plugin manager
+require("config.lazy")
 
 -- Load core configuration
 require("config.options")
