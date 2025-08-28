@@ -9,31 +9,53 @@ vim.g.maplocalleader = "\\"
 local config_dir = vim.fn.stdpath("config")
 package.path = config_dir .. "/?.lua;" .. config_dir .. "/?/init.lua;" .. package.path
 
--- Skip lazy.nvim bootstrap since plugins are already installed
--- and the auto-installation is causing the "Too many rounds" error
-local lazypath = "/nfs/iil/proj/mpg/sa_09/chip_design/projects/usb2/sonora3/ysalomox/nvim-plugins/lazy/lazy.nvim"
+-- Completely bypass lazy.nvim due to persistent issues
+-- Use only built-in Neovim features for a stable configuration
 
--- Only try to load lazy.nvim if it exists, don't auto-install
-if vim.loop.fs_stat(lazypath) then
-  vim.opt.rtp:prepend(lazypath)
+print("Loading minimal Neovim configuration with built-in features...")
 
-  -- Try to load lazy.nvim safely
-  local ok, lazy = pcall(require, "lazy")
-  if ok then
-    print("Loading existing plugins...")
-    -- Just load existing plugins, don't try to install new ones
-    lazy.setup({}, {
-      root = "/nfs/iil/proj/mpg/sa_09/chip_design/projects/usb2/sonora3/ysalomox/nvim-plugins",
-      install = { missing = false }, -- Don't auto-install missing plugins
-      checker = { enabled = false }, -- Disable update checker
-      change_detection = { enabled = false }, -- Disable file watching
-    })
-  else
-    print("Lazy.nvim found but failed to load, skipping plugin manager...")
-  end
-else
-  print("Lazy.nvim not found, using built-in features only...")
-end
+-- Basic colorscheme (using built-in schemes)
+vim.cmd([[
+  try
+    colorscheme desert
+  catch
+    colorscheme default
+  endtry
+]])
+
+-- Basic file explorer using netrw (built-in)
+vim.g.netrw_banner = 0
+vim.g.netrw_liststyle = 3
+vim.g.netrw_browse_split = 4
+vim.g.netrw_altv = 1
+vim.g.netrw_winsize = 25
+
+-- Key mapping for file explorer
+vim.keymap.set("n", "<leader>e", ":Explore<CR>", { desc = "Open file explorer" })
+
+-- Basic find functionality using built-in commands
+vim.keymap.set("n", "<leader>ff", ":find ", { desc = "Find files" })
+vim.keymap.set("n", "<leader>fg", ":grep ", { desc = "Grep search" })
+vim.keymap.set("n", "<leader>fb", ":ls<CR>:b ", { desc = "List buffers" })
+
+-- Basic status line
+vim.opt.laststatus = 2
+vim.opt.statusline = "%f %h%m%r%=%-14.(%l,%c%V%) %P"
+
+-- Enable syntax highlighting (built-in)
+vim.cmd("syntax enable")
+
+-- Basic completion
+vim.opt.wildmenu = true
+vim.opt.wildmode = "longest:full,full"
+
+print("Minimal configuration loaded successfully!")
+print("Using only built-in Neovim features.")
+print("Key mappings:")
+print("  <leader>e  - Open file explorer")
+print("  <leader>ff - Find files")
+print("  <leader>fg - Grep search")
+print("  <leader>fb - List buffers")
 
 -- Load core configuration
 require("config.options")
