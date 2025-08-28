@@ -14,8 +14,11 @@ vim.opt.rtp:prepend(lazypath)
 
 -- Configure lazy.nvim
 require("lazy").setup({
-  -- Import plugins from the plugins directory
-  { import = "plugins" },
+  -- Explicitly load each plugin file instead of auto-discovery
+  require("plugins.colorscheme"),
+  require("plugins.editor"),
+  require("plugins.ui"),
+  require("plugins.coding"),
 }, {
   -- Custom plugin installation directory
   root = "/tmp/nvim-plugins", -- directory where plugins will be installed
