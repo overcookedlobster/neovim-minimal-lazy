@@ -1,5 +1,5 @@
 -- Bootstrap lazy.nvim plugin manager
-local lazypath = "/tmp/nvim-plugins/lazy/lazy.nvim"
+local lazypath = "/nfs/iil/proj/mpg/sa_09/chip_design/projects/usb2/sonora3/ysalomox/nvim-plugins/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system({
     "git",
@@ -21,7 +21,7 @@ require("lazy").setup({
   require("plugins.coding"),
 }, {
   -- Custom plugin installation directory
-  root = "/tmp/nvim-plugins", -- directory where plugins will be installed
+  root = "/nfs/iil/proj/mpg/sa_09/chip_design/projects/usb2/sonora3/ysalomox/nvim-plugins", -- directory where plugins will be installed
   -- Lazy.nvim configuration options
   defaults = {
     lazy = false, -- should plugins be lazy-loaded?
